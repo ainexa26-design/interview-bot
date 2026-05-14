@@ -5,6 +5,7 @@ from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
+import random
 
 
 load_dotenv()
@@ -92,12 +93,14 @@ def handle_message(event):
             ai_message = response.choices[0].message.content
 
             if question_count[user_id] >= 5:
-                ai_message += """
+                score = random.randint(60,100)
+
+                ai_message += f"""
 
             ----------------
             面接終了です！
 
-            総合評価：85/100
+            総合評価：{score}/100
 
             良かった点：
             ・コミュニケーション力がある
