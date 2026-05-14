@@ -22,6 +22,7 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 conversation_history = {}
+question_count = {}
 
 @app.route("/webhook", methods=["POST"])
 def callback():
@@ -51,6 +52,9 @@ def handle_message(event):
 
     if user_id not in conversation_history:
         conversation_history[user_id] = []
+        question_count[user_id] = 0
+
+    question_count[user_id] += 1
 
     conversation_history[user_id].append({
         "role": "user",
@@ -87,7 +91,27 @@ def handle_message(event):
             )
             ai_message = response.choices[0].message.content
 
-                
+            if question_count[user_id] >= 5:
+                ai_message += """
+
+            ----------------
+            面接終了です！
+
+            総合評価：85/100
+
+            良かった点：
+            ・コミュニケーション力がある
+            ・目標が明確
+            ・受け答えが自然
+
+            改善点：
+            ・具体例を増やす
+            ・理由をもう少し深掘りする
+
+            お疲れさまでした！
+            """
+                question_count[user_id] = 0
+                conversation_history[user_id] = []
 
             conversation_history[user_id].append({
                 "role": "assistant",
